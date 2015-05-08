@@ -30,8 +30,9 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     }, 300);
   }
 
-  migrate.finish = function(logger) {
+  migrate.finish = function(logger, callback) {
     gotLogger = true;
+    callback();
   };
 
   migration('scan', 'local/' + dynamodb.tableName, migrate, true, 10, function(err, logpath) {
