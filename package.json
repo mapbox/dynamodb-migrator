@@ -1,0 +1,27 @@
+{
+  "name": "dynamodb-migrator",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.test.js"
+  },
+  "bin": {
+    "migrate": "bin/migrate.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mapbox/dynamodb-migrator.git"
+  },
+  "author": "Mapbox",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mapbox/dynamodb-migrator/issues"
+  },
+  "homepage": "https://github.com/mapbox/dynamodb-migrator#readme",
+  "devDependencies": {
+    "dynamodb-test": "0.0.4",
+    "tape": "^4.0.0",
+    "underscore": "^1.8.3"
+  }
+}
