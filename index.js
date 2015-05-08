@@ -35,7 +35,7 @@ module.exports = function(method, database, migrate, live, concurrency, callback
       .on('error', callback)
       .on('finish', function() {
         console.log('finish');
-        if (migrate.finish) migrate.finish();
+        if (migrate.finish) migrate.finish(migrator.log);
         migrator.log.on('finish', function() {
           callback(null, migrator.log.path);
         });

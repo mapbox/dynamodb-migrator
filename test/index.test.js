@@ -14,7 +14,7 @@ var fixtures = _.range(100).map(function(i) {
 
 dynamodb.test('[index] live scan', fixtures, function(assert) {
   var active = 0;
-
+  var gotLogger = false;
   function migrate(item, dyno, logger, callback) {
     active++;
     if (active > 10) assert.fail('surpassed concurrency');
@@ -30,10 +30,15 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     }, 300);
   }
 
+  migrate.finish = function(logger) {
+    gotLogger = true;
+  };
+
   migration('scan', 'local/' + dynamodb.tableName, migrate, true, 10, function(err, logpath) {
     assert.ifError(err, 'success');
     var log = fs.readFileSync(logpath, 'utf8');
     assert.ok(log, 'logged data');
+    assert.ok(gotLogger, 'finish function received logger');
     assert.end();
   });
 });

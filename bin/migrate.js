@@ -3,6 +3,7 @@
 var args = require('minimist')(process.argv.slice(2));
 var migration = require('..');
 var path = require('path');
+var fs = require('fs');
 
 function usage() {
   console.error('');
