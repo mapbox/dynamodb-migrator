@@ -23,5 +23,11 @@
     "dynamodb-test": "0.0.4",
     "tape": "^4.0.0",
     "underscore": "^1.8.3"
+  },
+  "dependencies": {
+    "dyno": "^0.13.1",
+    "minimist": "^1.1.1",
+    "queue-async": "^1.0.7",
+    "split": "^0.3.3"
   }
 }
