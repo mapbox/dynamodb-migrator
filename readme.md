@@ -1,5 +1,7 @@
 # dynamodb-migrator
 
+[![Build Status](https://travis-ci.org/mapbox/dynamodb-migrator.svg?branch=master)](https://travis-ci.org/mapbox/dynamodb-migrator)
+
 For migration and cleanup operations on your DynamoDB table
 
 ## Usage
