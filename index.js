@@ -3,7 +3,7 @@ var Migrator = require('./lib/migrator');
 var Dyno = require('dyno');
 var split = require('split');
 
-module.exports = function(method, database, migrate, live, concurrency, callback) {
+module.exports = function(method, database, migrate, stream, live, concurrency, callback) {
   require('http').globalAgent.maxSockets = 5 * concurrency;
   require('https').globalAgent.maxSockets = 5 * concurrency;
 
@@ -17,6 +17,20 @@ module.exports = function(method, database, migrate, live, concurrency, callback
     params.accessKeyId = 'fake';
     params.secretAccessKey = 'fake';
     params.endpoint = 'http://localhost:4567';
+  }
+
+  if (stream) {
+    params.kinesisConfig = {
+      stream: stream.split('/')[1],
+      region: stream.split('/')[0],
+      key: stream.split('/').slice(2)
+    };
+
+    if (stream.split('/')[0] === 'local') {
+      params.kinesisConfig.accessKeyId = 'fake';
+      params.kinesisConfig.secretAccessKey = 'fake';
+      params.kinesisConfig.endpoint = 'http://localhost:7654';
+    }
   }
 
   var dyno = Dyno(params);

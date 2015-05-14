@@ -14,6 +14,7 @@ function usage() {
   console.error('script: relative path to a migration script');
   console.error('');
   console.error('Options:');
+  console.error(' - stream: region/name/key/key specifying region, name and keys for replication kinesis stream');
   console.error(' - concurrency [1]: number of records to process in parallel');
   console.error(' - live [false]: if not specified, the migration script will not receive a database reference');
 }
@@ -45,7 +46,7 @@ if (!fs.existsSync(script)) {
 
 var migrate = require(script);
 
-migration(method, database, migrate, args.live, args.concurrency || 1, function(err, logpath) {
+migration(method, database, migrate, args.stream, args.live, args.concurrency || 1, function(err, logpath) {
   if (err) throw err;
   console.log('Log written to %s', logpath);
 });
