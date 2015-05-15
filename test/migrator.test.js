@@ -27,7 +27,7 @@ test('[migrator] live', function(assert) {
   migrator.on('finish', function() {
     var log = fs.readFileSync(migrator.log.path, 'utf8');
     var expected = items.map(function(item) {
-      return '[info] ' + item;
+      return JSON.stringify(item);
     }).join('\n') + '\n';
     assert.equal(log, expected, 'wrote expected log');
     assert.end();
@@ -58,7 +58,7 @@ test('[migrator] not live', function(assert) {
   migrator.on('finish', function() {
     var log = fs.readFileSync(migrator.log.path, 'utf8');
     var expected = items.map(function(item) {
-      return '[info] ' + item;
+      return JSON.stringify(item);
     }).join('\n') + '\n';
     assert.equal(log, expected, 'wrote expected log');
     assert.end();

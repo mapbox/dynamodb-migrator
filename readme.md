@@ -24,7 +24,6 @@ module.exports = function(record, dyno, logger, callback) {
 
   dyno.deleteItem({ id: record.id }, function(err) {
     if (err) {
-      // Errors are captured in a different file than info logs
       logger.error('%s failed to delete', record.id);
 
       // Sending an error to the callback function will stop the migration

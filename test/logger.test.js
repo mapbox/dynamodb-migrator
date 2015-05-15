@@ -12,7 +12,7 @@ test('[logger]', function(assert) {
 
   logger.on('finish', function() {
     var output = fs.readFileSync(logger.path, 'utf8');
-    assert.equal(output, '[info] informational 1\n[error] problematic 2\n', 'writes expected log file');
+    assert.equal(output, 'informational 1\n[error] problematic 2\n', 'writes expected log file');
     assert.end();
   });
 });
