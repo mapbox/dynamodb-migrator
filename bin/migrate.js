@@ -7,7 +7,7 @@ var fs = require('fs');
 
 function usage() {
   console.error('');
-  console.error('Usage: migrate <method> <database> <script>');
+  console.error('Usage: dynamodb-migrate <method> <database> <script>');
   console.error('');
   console.error('method: either scan or stream to read records from the database or from stdin, respectively');
   console.error('database: region/name of the database to work against');
