@@ -52,7 +52,7 @@ Scan mode is where the database is scanned and your migration script will be fed
 Run your migration without impacting any records to check that your conditions are filtering as you expect them to. Remember that your migration script *will not* receive a dyno object in this case.
 
 ```
-$ migrate scan us-east-1/my-table ./my-migration-script.js
+$ dynamodb-migrate scan us-east-1/my-table ./my-migration-script.js
 ```
 
 When the migration is complete, it will print the paths to your info and error logs.
@@ -62,13 +62,13 @@ When the migration is complete, it will print the paths to your info and error l
 Specify the `--live` flag to run the migration once and for all.
 
 ```
-$ migrate scan us-east-1/my-table ./my-migration-script.js --live
+$ dynamodb-migrate scan us-east-1/my-table ./my-migration-script.js --live
 ```
 
 ## Help
 
 ```
-Usage: migrate <method> <database> <script>
+Usage: dynamodb-migrate <method> <database> <script>
 
 method: either scan or stream to read records from the database or from stdin, respectively
 database: region/name of the database to work against

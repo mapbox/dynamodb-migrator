@@ -7,7 +7,7 @@
     "test": "tape test/*.test.js"
   },
   "bin": {
-    "dynamo-migrate": "bin/migrate.js"
+    "dynamodb-migrate": "bin/migrate.js"
   },
   "repository": {
     "type": "git",
