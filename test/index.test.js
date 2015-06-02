@@ -31,8 +31,9 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     }, 300);
   }
 
-  migrate.finish = function(logger, callback) {
+  migrate.finish = function(dyno, logger, callback) {
     gotLogger = true;
+    assert.ok(dyno, 'finish function received dyno');
     callback();
   };
 

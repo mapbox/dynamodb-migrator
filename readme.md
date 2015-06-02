@@ -35,7 +35,7 @@ module.exports = function(record, dyno, logger, callback) {
   });
 }
 
-module.exports.finish = function(logger, callback) {
+module.exports.finish = function(dyno, logger, callback) {
   logger.info('Deleted %s records', deleted);
   callback();
 }

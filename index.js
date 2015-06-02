@@ -48,7 +48,7 @@ module.exports = function(method, database, migrate, stream, live, concurrency, 
     .pipe(migrator)
       .on('error', callback)
       .on('finish', function() {
-        if (migrate.finish) migrate.finish(migrator.log, done);
+        if (migrate.finish) migrate.finish(dyno, migrator.log, done);
         else done();
 
         function done() {
