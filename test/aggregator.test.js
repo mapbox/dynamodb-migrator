@@ -1,6 +1,7 @@
 var test = require('tape');
 var _ = require('underscore');
 var Aggregator = require('../lib/aggregator');
+var Dyno = require('dyno');
 
 test('[aggregator] objects', function(assert) {
   var aggregator = Aggregator(1, true);
@@ -50,7 +51,7 @@ test('[aggregator] strings', function(assert) {
   });
 
   _.range(30).forEach(function(i) {
-    aggregator.write(JSON.stringify({
+    aggregator.write(Dyno.serialize({
       data: 'base64:' + (new Buffer(i.toString())).toString('base64')
     }));
   });
