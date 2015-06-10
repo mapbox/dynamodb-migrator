@@ -8,6 +8,7 @@ var migration = require('..');
 var fixtures = _.range(100).map(function(i) {
   return {
     id: i.toString(),
+    collection: 'fake:' + i.toString(),
     data: 'base64:' + (new Buffer(i.toString())).toString('base64'),
     decoded: new Buffer(i.toString())
   };
@@ -60,16 +61,45 @@ dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
   var stream = 'local/' + kinesis.streamName + '/id';
 
   migration('scan', table, migrate, stream, true, 10, function(err, logpath) {
-    kinesis.shards[0].on('end', function() {
-      assert.equal(records, fixtures.length, 'wrote to kinesis');
-      assert.end();
-    });
-
     setTimeout(function() {
-      kinesis.shards[0].close();
+        assert.equal(records, fixtures.length, 'wrote to kinesis');
+        records = 0;
+        assert.end();
     }, 1000);
   });
+});
+kinesis.delete();
+
+kinesis.start();
+dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
+    var records = 0;
+
+    function migrate(item, dyno, logger, callback) {
+        var key = {id: item.id, collection: item.collection};
+        console.log(key);
+        dyno.deleteItem(key, callback);
+    }
+
+    kinesis.shards[0].on('data', function() {
+        records++;
+        console.log('wrote a record to kinesis');
+    });
+
+    var table = 'local/' + dynamodb.tableName;
+    var stream = 'local/' + kinesis.streamName + '/id,collection';
+
+    migration('scan', table, migrate, stream, true, 10, function(err, logpath) {
+        kinesis.shards[0].on('end', function() {
+            assert.equal(records, fixtures.length, 'wrote to kinesis');
+            assert.end();
+        });
+
+        setTimeout(function() {
+            kinesis.shards[0].close();
+        }, 1000);
+    }); 
 });
 
 dynamodb.close();
 kinesis.close();
+
