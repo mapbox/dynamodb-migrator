@@ -23,7 +23,7 @@ module.exports = function(method, database, migrate, stream, live, concurrency, 
     params.kinesisConfig = {
       stream: stream.split('/')[1],
       region: stream.split('/')[0],
-      key: stream.split('/').slice(2)
+      key: stream.split('/')[2].split(',')
     };
 
     if (stream.split('/')[0] === 'local') {
@@ -31,7 +31,7 @@ module.exports = function(method, database, migrate, stream, live, concurrency, 
       params.kinesisConfig.secretAccessKey = 'fake';
       params.kinesisConfig.endpoint = 'http://localhost:7654';
     }
-  }
+}
 
   var dyno = Dyno(params);
 
