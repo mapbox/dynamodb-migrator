@@ -31,7 +31,7 @@ module.exports = function(method, database, migrate, stream, live, concurrency, 
       params.kinesisConfig.secretAccessKey = 'fake';
       params.kinesisConfig.endpoint = 'http://localhost:7654';
     }
-}
+  }
 
   var dyno = Dyno(params);
 

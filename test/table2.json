@@ -1,0 +1,16 @@
+{
+    "TableName": "test2",
+    "AttributeDefinitions": [
+        {"AttributeName": "id", "AttributeType": "S"},
+        {"AttributeName": "collection", "AttributeType": "S"}
+    ],
+    "KeySchema": [
+        {"AttributeName": "collection", "KeyType": "HASH"},
+        {"AttributeName": "id", "KeyType": "RANGE"}
+    ],
+    "ProvisionedThroughput": {
+        "ReadCapacityUnits": 1,
+        "WriteCapacityUnits": 1
+    }
+}
+

@@ -1,6 +1,11 @@
 var table = require('./table.json');
 var dynamodb = require('dynamodb-test')('dynamodb-migrator', table);
 var kinesis = require('kinesis-test')('dynamodb-migrator', 1);
+
+var table2 = require('./table2.json');
+var dynamodb2 = require('dynamodb-test')('dynamodb-migrator2', table2);
+var kinesis2 = require('kinesis-test')('dynamodb-migrator2', 1);
+
 var _ = require('underscore');
 var fs = require('fs');
 var migration = require('..');
@@ -61,45 +66,43 @@ dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
   var stream = 'local/' + kinesis.streamName + '/id';
 
   migration('scan', table, migrate, stream, true, 10, function(err, logpath) {
+    kinesis.shards[0].on('end', function() {
+      assert.equal(records, fixtures.length, 'wrote to kinesis');
+      assert.end();
+    });
+
     setTimeout(function() {
-        assert.equal(records, fixtures.length, 'wrote to kinesis');
-        records = 0;
-        assert.end();
+      kinesis.shards[0].close();
     }, 1000);
   });
 });
-kinesis.delete();
+dynamodb.close();
+kinesis.close();
 
-kinesis.start();
-dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
+kinesis2.start();
+dynamodb2.test('[index] live scan with kinesis, 2-property key', fixtures, function(assert) {
     var records = 0;
 
     function migrate(item, dyno, logger, callback) {
         var key = {id: item.id, collection: item.collection};
-        console.log(key);
         dyno.deleteItem(key, callback);
     }
 
-    kinesis.shards[0].on('data', function() {
-        records++;
-        console.log('wrote a record to kinesis');
-    });
+    kinesis2.shards[0].on('data', function() { records++; });
 
-    var table = 'local/' + dynamodb.tableName;
-    var stream = 'local/' + kinesis.streamName + '/id,collection';
+    var table = 'local/' + dynamodb2.tableName;
+    var stream = 'local/' + kinesis2.streamName + '/id,collection';
 
     migration('scan', table, migrate, stream, true, 10, function(err, logpath) {
-        kinesis.shards[0].on('end', function() {
+        kinesis2.shards[0].on('end', function() {
             assert.equal(records, fixtures.length, 'wrote to kinesis');
             assert.end();
         });
 
         setTimeout(function() {
-            kinesis.shards[0].close();
+            kinesis2.shards[0].close();
         }, 1000);
     }); 
 });
-
-dynamodb.close();
-kinesis.close();
-
+dynamodb2.close();
+kinesis2.close();
