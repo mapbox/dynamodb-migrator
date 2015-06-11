@@ -65,6 +65,13 @@ Specify the `--live` flag to run the migration once and for all.
 $ dynamodb-migrate scan us-east-1/my-table ./my-migration-script.js --live
 ```
 
+### Write to a kinesis stream
+
+` --stream region/streamName/key`
+
+To write records to a kinesis stream for replication, `--stream` may be passed as an option. `region`, `stream name`, and `key` should be given as `/`-separated arguments in that order. `key` may contain multiple properties, separated by a comma (e.g. `region/streamName/id,collection`).
+
+
 ## Help
 
 ```
