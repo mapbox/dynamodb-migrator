@@ -14,7 +14,7 @@ function usage() {
   console.error('script: relative path to a migration script');
   console.error('');
   console.error('Options:');
-  console.error(' - stream: region/name/key/key specifying region, name and keys for replication kinesis stream');
+  console.error(' - stream: region/name/key specifying region, name and keys (keys may be comma separated for multiple properties) for replication kinesis stream');
   console.error(' - concurrency [1]: number of records to process in parallel');
   console.error(' - live [false]: if not specified, the migration script will not receive a database reference');
 }
