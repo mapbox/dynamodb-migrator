@@ -9,6 +9,7 @@ var kinesis2 = require('kinesis-test')('dynamodb-migrator2', 1);
 var _ = require('underscore');
 var fs = require('fs');
 var migration = require('..');
+var stream = require('stream');
 
 var fixtures = _.range(100).map(function(i) {
   return {
@@ -76,8 +77,45 @@ dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
     }, 1000);
   });
 });
-dynamodb.close();
 kinesis.close();
+
+dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(assert) {
+  var received = [];
+  var gotLogger = false;
+  function migrate(item, dyno, logger, callback) {
+    received.push(item);
+
+    setTimeout(function() {
+      callback();
+    }, 300);
+  }
+
+  migrate.finish = function(dyno, logger, callback) {
+    gotLogger = true;
+    assert.ok(dyno, 'finish function received dyno');
+    callback();
+  };
+
+  var testStream = new stream.Readable();
+  testStream.items = [{ id: { N: '1'} }, { id: { N: '2'} }, { id: { N: '3'} }, { id: { N: '4'} }, { id: { N: '5'} }, { id: { N: '6'} }];
+  testStream.index = 0;
+  testStream._read = function() {
+    testStream.push(JSON.stringify(testStream.items[testStream.index]) + '\n');
+    testStream.index++;
+    if (testStream.index === 6) testStream.push(null);
+  };
+
+  migration(testStream, 'local/' + dynamodb.tableName, migrate, null, true, 10, function(err, logpath) {
+    assert.ifError(err, 'success');
+    assert.deepEqual(
+      received,
+      [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}],
+      'received everything from the test stream'
+    );
+    assert.end();
+  });
+});
+dynamodb.close();
 
 kinesis2.start();
 dynamodb2.test('[index] live scan with kinesis, 2-property key', fixtures, function(assert) {
@@ -102,7 +140,7 @@ dynamodb2.test('[index] live scan with kinesis, 2-property key', fixtures, funct
         setTimeout(function() {
             kinesis2.shards[0].close();
         }, 1000);
-    }); 
+    });
 });
 dynamodb2.close();
 kinesis2.close();

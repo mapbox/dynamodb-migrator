@@ -2,6 +2,7 @@ var Aggregator = require('./lib/aggregator');
 var Migrator = require('./lib/migrator');
 var Dyno = require('dyno');
 var split = require('split');
+var Readable = require('stream').Readable;
 
 module.exports = function(method, database, migrate, stream, live, concurrency, callback) {
   require('http').globalAgent.maxSockets = 5 * concurrency;
@@ -38,9 +39,11 @@ module.exports = function(method, database, migrate, stream, live, concurrency, 
   var aggregator = Aggregator(concurrency, method === 'scan');
   var migrator = Migrator(migrate, dyno, concurrency, live);
 
-  var scanner = method === 'scan' ?
-    dyno.scan({ pages: 0 }) :
-    process.stdin.pipe(split());
+  var scanner = (function() {
+    if (method === 'scan') return dyno.scan({ pages: 0 });
+    if (method === 'stream') return process.stdin.pipe(split());
+    if (method instanceof Readable) return method;
+  })();
 
   scanner
     .pipe(aggregator)
