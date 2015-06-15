@@ -4,7 +4,7 @@ var Dyno = require('dyno');
 var split = require('split');
 var Readable = require('stream').Readable;
 
-module.exports = function(method, database, migrate, stream, live, concurrency, callback) {
+module.exports = function(method, database, migrate, stream, live, json, concurrency, callback) {
   require('http').globalAgent.maxSockets = 5 * concurrency;
   require('https').globalAgent.maxSockets = 5 * concurrency;
 
@@ -36,7 +36,7 @@ module.exports = function(method, database, migrate, stream, live, concurrency, 
 
   var dyno = Dyno(params);
 
-  var aggregator = Aggregator(concurrency, method === 'scan');
+  var aggregator = Aggregator(concurrency, method === 'scan', json);
   var migrator = Migrator(migrate, dyno, concurrency, live);
 
   var scanner = (function() {
