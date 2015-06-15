@@ -17,7 +17,7 @@ function usage() {
   console.error(' - stream: region/name/key specifying region, name and keys (keys may be comma separated for multiple properties) for replication kinesis stream');
   console.error(' - concurrency [1]: number of records to process in parallel');
   console.error(' - live [false]: if not specified, the migration script will not receive a database reference');
-  console.error(' - json [false]: if not specified, the migration will expect json in dynamo wire-format');
+  console.error(' - dyno [false]: if not specified, it is assumed that the objects are formatted using standard DynamoDB syntax. Pass the `--dyno` flag to the migrator if your input JSON objects are in a format suitable for direct usage in dyno (https://github.com/mapbox/dyno)');
 }
 
 if (args.help) {
@@ -47,7 +47,7 @@ if (!fs.existsSync(script)) {
 
 var migrate = require(script);
 
-migration(method, database, migrate, args.stream, args.live, args.json, args.concurrency || 1, function(err, logpath) {
+migration(method, database, migrate, args.stream, args.live, args.dyno, args.concurrency || 1, function(err, logpath) {
   if (err) throw err;
   console.log('Log written to %s', logpath);
 });
