@@ -44,7 +44,7 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     callback();
   };
 
-  migration('scan', 'local/' + dynamodb.tableName, migrate, null, true, 10, function(err, logpath) {
+  migration('scan', 'local/' + dynamodb.tableName, migrate, null, true, false, 10, function(err, logpath) {
     assert.ifError(err, 'success');
     var log = fs.readFileSync(logpath, 'utf8');
     assert.ok(log, 'logged data');
@@ -66,7 +66,7 @@ dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
   var table = 'local/' + dynamodb.tableName;
   var stream = 'local/' + kinesis.streamName + '/id';
 
-  migration('scan', table, migrate, stream, true, 10, function(err, logpath) {
+  migration('scan', table, migrate, stream, true, false, 10, function(err, logpath) {
     kinesis.shards[0].on('end', function() {
       assert.equal(records, fixtures.length, 'wrote to kinesis');
       assert.end();
@@ -105,7 +105,7 @@ dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(
     if (testStream.index === 6) testStream.push(null);
   };
 
-  migration(testStream, 'local/' + dynamodb.tableName, migrate, null, true, 10, function(err, logpath) {
+  migration(testStream, 'local/' + dynamodb.tableName, migrate, null, true, false, 10, function(err, logpath) {
     assert.ifError(err, 'success');
     assert.deepEqual(
       received,
@@ -131,7 +131,7 @@ dynamodb2.test('[index] live scan with kinesis, 2-property key', fixtures, funct
     var table = 'local/' + dynamodb2.tableName;
     var stream = 'local/' + kinesis2.streamName + '/id,collection';
 
-    migration('scan', table, migrate, stream, true, 10, function(err, logpath) {
+    migration('scan', table, migrate, stream, true, false, 10, function(err, logpath) {
         kinesis2.shards[0].on('end', function() {
             assert.equal(records, fixtures.length, 'wrote to kinesis');
             assert.end();
