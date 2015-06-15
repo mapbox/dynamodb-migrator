@@ -32,7 +32,7 @@ test('[aggregator] objects', function(assert) {
   aggregator.end();
 });
 
-test('[aggregator] strings', function(assert) {
+test('[aggregator] strings, DynamoDB wire-format json', function(assert) {
   var aggregator = Aggregator(1, false);
   var count = 0;
 
@@ -52,6 +52,33 @@ test('[aggregator] strings', function(assert) {
 
   _.range(30).forEach(function(i) {
     aggregator.write(Dyno.serialize({
+      data: 'base64:' + (new Buffer(i.toString())).toString('base64')
+    }));
+  });
+
+  aggregator.end();
+});
+
+test('[aggregator] strings, dyno-compatible json', function(assert) {
+  var aggregator = Aggregator(1, false, true);
+  var count = 0;
+
+  aggregator.on('data', function(data) {
+    assert.ok(data.length <= 10, 'aggregates into blocks of up to 10x concurrency');
+    count += data.length;
+
+    data.forEach(function(d) {
+      assert.ok(Buffer.isBuffer(d.data), 'decodes base64 strings');
+    });
+  });
+
+  aggregator.on('end', function() {
+    assert.equal(count, 30, 'passed all records through');
+    assert.end();
+  });
+
+  _.range(30).forEach(function(i) {
+    aggregator.write(JSON.stringify({
       data: 'base64:' + (new Buffer(i.toString())).toString('base64')
     }));
   });
