@@ -47,6 +47,27 @@ Streaming mode is where you feed records into your migration script from a file.
 
 Scan mode is where the database is scanned and your migration script will be fed each record in the database.
 
+### Do you need to prefilter?
+
+If you're running in stream mode from something like a prior database dump, you may want to prefilter your dump so that it only includes records you're interested in. `dynamodb-filter` is provided for you to help do this.
+
+1. Write a filter function. It will be passed one argument: a single line (as a string) from the original file. The function is expected to return `true/false` indicating whether or not that line should be written into your filtered output. It should be written into a Node.js module as the module's `exports`, i.e.
+
+    ```js
+    module.exports = function(line) {
+      // I only care about ham.
+      return line.indexOf('ham') > -1;
+    };
+    ```
+
+2. Run `dynamodb-filter`:
+
+```sh
+# dynamodb-filter <input file path> <filter function path> [--output <output file path>]
+$ dynamodb-filter ./some-dump.gz ./my-script.js > ./some-filtered-dump.gz
+$ dynamodb-filter ./some-dump.gz ./my-script.js --output ./some-filtered-dump.gz
+```
+
 ### Write to a kinesis stream
 
 ` --stream region/streamName/key`
