@@ -115,6 +115,47 @@ dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(
     assert.end();
   });
 });
+
+dynamodb.test('[index] test-mode with user-provided stream that needs splitting', fixtures, function(assert) {
+  var received = [];
+  var gotLogger = false;
+  function migrate(item, dyno, logger, callback) {
+    received.push(item);
+
+    setTimeout(function() {
+      callback();
+    }, 300);
+  }
+
+  migrate.finish = function(dyno, logger, callback) {
+    gotLogger = true;
+    assert.ok(dyno, 'finish function received dyno');
+    callback();
+  };
+
+  var testStream = new stream.Readable();
+  testStream.items = [{ id: { N: '1'} }, { id: { N: '2'} }, { id: { N: '3'} }, { id: { N: '4'} }, { id: { N: '5'} }, { id: { N: '6'} }];
+  testStream.finished = false;
+  testStream._read = function() {
+    if (testStream.finished) return testStream.push(null);
+    var data = testStream.items.reduce(function(data, item, i) {
+      data += i > 0 ? '\n' + JSON.stringify(item) : JSON.stringify(item);
+      return data;
+    }, '');
+    testStream.push(data);
+    testStream.finished = true;
+  };
+
+  migration(testStream, 'local/' + dynamodb.tableName, migrate, null, true, false, 10, function(err, logpath) {
+    assert.ifError(err, 'success');
+    assert.deepEqual(
+      received,
+      [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}],
+      'received everything from the test stream'
+    );
+    assert.end();
+  });
+});
 dynamodb.close();
 
 kinesis2.start();
