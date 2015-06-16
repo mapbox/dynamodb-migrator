@@ -42,7 +42,7 @@ module.exports = function(method, database, migrate, stream, live, plainJSON, co
   var scanner = (function() {
     if (method === 'scan') return dyno.scan({ pages: 0 });
     if (method === 'stream') return process.stdin.pipe(split());
-    if (method instanceof Readable) return method;
+    if (method instanceof Readable) return method.pipe(split());
   })();
 
   scanner
