@@ -22,15 +22,13 @@ var fixtures = _.range(100).map(function(i) {
 
 dynamodb.test('[index] live scan', fixtures, function(assert) {
   var active = 0;
-  var gotLogger = false;
-  function migrate(item, dyno, logger, callback) {
+  function migrate(item, dyno, callback) {
     active++;
     if (active > 10) assert.fail('surpassed concurrency');
 
     assert.ok(dyno, 'received dyno');
     assert.ok(item.id, 'one item');
     assert.ok(Buffer.isBuffer(item.data), 'decoded base64 data');
-    logger.info(item.id);
 
     setTimeout(function() {
       active--;
@@ -38,17 +36,13 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     }, 300);
   }
 
-  migrate.finish = function(dyno, logger, callback) {
-    gotLogger = true;
+  migrate.finish = function(dyno, callback) {
     assert.ok(dyno, 'finish function received dyno');
     callback();
   };
 
   migration('scan', 'local/' + dynamodb.tableName, migrate, null, true, false, 10, function(err, logpath) {
     assert.ifError(err, 'success');
-    var log = fs.readFileSync(logpath, 'utf8');
-    assert.ok(log, 'logged data');
-    assert.ok(gotLogger, 'finish function received logger');
     assert.end();
   });
 });
@@ -57,7 +51,7 @@ kinesis.start();
 dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
   var records = 0;
 
-  function migrate(item, dyno, logger, callback) {
+  function migrate(item, dyno, callback) {
     dyno.deleteItem({ id: item.id }, callback);
   }
 
@@ -81,8 +75,7 @@ kinesis.close();
 
 dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(assert) {
   var received = [];
-  var gotLogger = false;
-  function migrate(item, dyno, logger, callback) {
+  function migrate(item, dyno, callback) {
     received.push(item);
 
     setTimeout(function() {
@@ -90,8 +83,7 @@ dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(
     }, 300);
   }
 
-  migrate.finish = function(dyno, logger, callback) {
-    gotLogger = true;
+  migrate.finish = function(dyno, callback) {
     assert.ok(dyno, 'finish function received dyno');
     callback();
   };
@@ -118,8 +110,7 @@ dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(
 
 dynamodb.test('[index] test-mode with user-provided stream that needs splitting', fixtures, function(assert) {
   var received = [];
-  var gotLogger = false;
-  function migrate(item, dyno, logger, callback) {
+  function migrate(item, dyno, callback) {
     received.push(item);
 
     setTimeout(function() {
@@ -127,8 +118,7 @@ dynamodb.test('[index] test-mode with user-provided stream that needs splitting'
     }, 300);
   }
 
-  migrate.finish = function(dyno, logger, callback) {
-    gotLogger = true;
+  migrate.finish = function(dyno, callback) {
     assert.ok(dyno, 'finish function received dyno');
     callback();
   };
@@ -162,7 +152,7 @@ kinesis2.start();
 dynamodb2.test('[index] live scan with kinesis, 2-property key', fixtures, function(assert) {
     var records = 0;
 
-    function migrate(item, dyno, logger, callback) {
+    function migrate(item, dyno, callback) {
         var key = {id: item.id, collection: item.collection};
         dyno.deleteItem(key, callback);
     }

@@ -47,7 +47,6 @@ if (!fs.existsSync(script)) {
 
 var migrate = require(script);
 
-migration(method, database, migrate, args.stream, args.live, args.dyno, args.concurrency || 1, function(err, logpath) {
+migration(method, database, migrate, args.stream, args.live, args.dyno, args.concurrency || 1, function(err) {
   if (err) throw err;
-  console.log('Log written to %s', logpath);
 });
