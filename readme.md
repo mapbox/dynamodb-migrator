@@ -13,18 +13,17 @@ Write a module that exports a function that will run over each record in your ta
 ```js
 var deleted = 0;
 
-module.exports = function(record, dyno, logger, callback) {
+module.exports = function(record, dyno, callback) {
   if (record.flag !== 'delete-me') return callback();
 
-  // Use the logger object to both console.log and also capture logs to a file
-  logger.info('%s flagged for deletion', record.id);
+  console.log('%s flagged for deletion', record.id);
 
   // If you are running a dry-run, `dyno` will be null
   if (!dyno) return callback();
 
   dyno.deleteItem({ id: record.id }, function(err) {
     if (err) {
-      logger.error('%s failed to delete', record.id);
+      console.error('%s failed to delete', record.id);
 
       // Sending an error to the callback function will stop the migration
       return callback(new Error('A record failed to delete'));
@@ -35,8 +34,8 @@ module.exports = function(record, dyno, logger, callback) {
   });
 }
 
-module.exports.finish = function(dyno, logger, callback) {
-  logger.info('Deleted %s records', deleted);
+module.exports.finish = function(dyno, callback) {
+  console.log('Deleted %s records', deleted);
   callback();
 }
 ```
