@@ -51,14 +51,7 @@ module.exports = function(method, database, migrate, stream, live, plainJSON, co
     .pipe(migrator)
       .on('error', callback)
       .on('finish', function() {
-        if (migrate.finish) migrate.finish(live ? dyno : null, migrator.log, done);
-        else done();
-
-        function done() {
-          migrator.log.on('finish', function() {
-            callback(null, migrator.log.path);
-          });
-          migrator.log.end();
-        }
+        if (migrate.finish) migrate.finish(live ? dyno : null, callback);
+        else callback();
       });
 };
