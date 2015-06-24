@@ -1,11 +1,20 @@
-var Aggregator = require('./lib/aggregator');
+var Parser = require('./lib/parser');
 var Migrator = require('./lib/migrator');
 var Dyno = require('dyno');
 var split = require('split');
 var Readable = require('stream').Readable;
 var util = require('util');
 
-module.exports = function(method, database, migrate, stream, live, plainJSON, concurrency, callback) {
+module.exports = function(options, callback) {
+  var method = options.method;
+  var database = options.database;
+  var migrate = options.migrate;
+  var stream = options.stream;
+  var live = options.live;
+  var plainJSON = options.plainJSON;
+  var concurrency = options.concurrency;
+  var rateLogging = options.rateLogging;
+
   require('http').globalAgent.maxSockets = 5 * concurrency;
   require('https').globalAgent.maxSockets = 5 * concurrency;
 
@@ -37,7 +46,7 @@ module.exports = function(method, database, migrate, stream, live, plainJSON, co
 
   var dyno = Dyno(params);
 
-  var aggregator = Aggregator(concurrency, method === 'scan', plainJSON);
+  var parser = Parser(method === 'scan', plainJSON);
   var migrator = Migrator(migrate, dyno, concurrency, live);
 
   var scanner = (function() {
@@ -46,28 +55,31 @@ module.exports = function(method, database, migrate, stream, live, plainJSON, co
     if (method instanceof Readable) return method.pipe(split());
   })();
 
-  scanner.scans = 0;
-  scanner.on('dbrequest', function() {
-    scanner.scans++;
-  });
+  if (rateLogging) {
+    scanner.scans = 0;
+    scanner.on('dbrequest', function() {
+      scanner.scans++;
+    });
 
-  var starttime = Date.now();
-  setInterval(function() {
-    var msg = util.format(
-      '\r\033[KScanner scans: %s, read depth: %s, Aggregator write depth: %s, read depth: %s | Migrator depth: %s, active: %s, %s/s',
-      scanner.scans,
-      scanner._readableState.buffer.length,
-      aggregator._writableState.buffer.length,
-      aggregator._readableState.buffer.length,
-      migrator._writableState.buffer.length,
-      migrator.active,
-      (migrator.total / ((Date.now() - starttime) / 1000)).toFixed(4)
-    );
-    process.stdout.write(msg);
-  }, 50).unref();
+    var starttime = Date.now();
+
+    setInterval(function() {
+      var msg = util.format(
+        '\r\033[KScanner scans: %s, read depth: %s, Parser write depth: %s, read depth: %s | Migrator depth: %s, active: %s, %s/s',
+        scanner.scans,
+        scanner._readableState.buffer.length,
+        parser._writableState.buffer.length,
+        parser._readableState.buffer.length,
+        migrator._writableState.buffer.length,
+        migrator.active,
+        (migrator.total / ((Date.now() - starttime) / 1000)).toFixed(4)
+      );
+      process.stdout.write(msg);
+    }, 50).unref();
+  }
 
   scanner
-    .pipe(aggregator)
+    .pipe(parser)
       .on('error', callback)
     .pipe(migrator)
       .on('error', callback)
