@@ -54,10 +54,9 @@ module.exports = function(method, database, migrate, stream, live, plainJSON, co
   var starttime = Date.now();
   setInterval(function() {
     var msg = util.format(
-      '\r\033[KScanner scans: %s, read depth: %s, Aggregator write depth: %s, read depth: %s, item: %s | Migrator depth: %s, active: %s, %s/s',
+      '\r\033[KScanner scans: %s, read depth: %s, Aggregator write depth: %s, read depth: %s | Migrator depth: %s, active: %s, %s/s',
       scanner.scans,
       scanner._readableState.buffer.length,
-      aggregator.items(),
       aggregator._writableState.buffer.length,
       aggregator._readableState.buffer.length,
       migrator._writableState.buffer.length,
@@ -65,7 +64,7 @@ module.exports = function(method, database, migrate, stream, live, plainJSON, co
       (migrator.total / ((Date.now() - starttime) / 1000)).toFixed(4)
     );
     process.stdout.write(msg);
-  }, 500).unref();
+  }, 50).unref();
 
   scanner
     .pipe(aggregator)
