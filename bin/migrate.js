@@ -18,6 +18,7 @@ function usage() {
   console.error(' - concurrency [1]: number of records to process in parallel');
   console.error(' - live [false]: if not specified, the migration script will not receive a database reference');
   console.error(' - dyno [false]: if not specified, it is assumed that the objects are formatted using standard DynamoDB syntax. Pass the `--dyno` flag to the migrator if your input JSON objects are in a format suitable for direct usage in dyno (https://github.com/mapbox/dyno)');
+  console.error(' - rate [false]: log information about the rate at which migration is running. Will interfere with a migration script\'s logs');
 }
 
 if (args.help) {
@@ -47,6 +48,17 @@ if (!fs.existsSync(script)) {
 
 var migrate = require(script);
 
-migration(method, database, migrate, args.stream, args.live, args.dyno, args.concurrency || 1, function(err) {
+var options = {
+  method: method,
+  database: database,
+  migrate: migrate,
+  stream: args.stream,
+  live: args.live,
+  plainJSON: args.dyno,
+  concurrency: args.concurrency || 1,
+  rateLogging: args.rate
+};
+
+migration(options, function(err) {
   if (err) throw err;
 });
