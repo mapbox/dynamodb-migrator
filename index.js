@@ -66,8 +66,8 @@ module.exports = function(options, callback) {
     setInterval(function() {
       var msg = util.format(
         '\r\033[KScanner scans: %s, read depth: %s, Parser write depth: %s, read depth: %s | Migrator depth: %s, active: %s, %s/s',
-        scanner.scans,
-        scanner._readableState.buffer.length,
+        scanner.scans || 0,
+        scanner._readableState ? scanner._readableState.buffer.length : 0,
         parser._writableState.buffer.length,
         parser._readableState.buffer.length,
         migrator._writableState.buffer.length,
