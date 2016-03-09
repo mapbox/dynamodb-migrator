@@ -29,7 +29,7 @@
   "dependencies": {
     "dyno": "0.15.1",
     "minimist": "^1.1.1",
-    "queue-async": "^1.0.7",
+    "queue-async": "1.0.7",
     "split": "^0.3.3"
   }
 }
