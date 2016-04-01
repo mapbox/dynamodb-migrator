@@ -1,10 +1,7 @@
-var table = require('./table.json');
-var dynamodb = require('dynamodb-test')('dynamodb-migrator', table);
-var kinesis = require('kinesis-test')('dynamodb-migrator', 1);
+var tape = require('tape');
 
-var table2 = require('./table2.json');
-var dynamodb2 = require('dynamodb-test')('dynamodb-migrator2', table2);
-var kinesis2 = require('kinesis-test')('dynamodb-migrator2', 1);
+var table = require('./table.json');
+var dynamodb = require('dynamodb-test')(tape,'dynamodb-migrator', table);
 
 var _ = require('underscore');
 var fs = require('fs');
@@ -56,43 +53,6 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     assert.end();
   });
 });
-
-kinesis.start();
-dynamodb.test('[index] live scan with kinesis', fixtures, function(assert) {
-  var records = 0;
-
-  function migrate(item, dyno, callback) {
-    dyno.deleteItem({ id: item.id }, callback);
-  }
-
-  kinesis.shards[0].on('data', function() { records++; });
-
-  var table = 'local/' + dynamodb.tableName;
-  var stream = 'local/' + kinesis.streamName + '/id';
-
-  var options = {
-    method: 'scan',
-    database: table,
-    migrate: migrate,
-    stream: stream,
-    live: true,
-    plainJSON: false,
-    concurrency: 10,
-    rateLogging: false
-  };
-
-  migration(options, function(err, logpath) {
-    kinesis.shards[0].on('end', function() {
-      assert.equal(records, fixtures.length, 'wrote to kinesis');
-      assert.end();
-    });
-
-    setTimeout(function() {
-      kinesis.shards[0].close();
-    }, 1000);
-  });
-});
-kinesis.close();
 
 dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(assert) {
   var received = [];
@@ -190,42 +150,3 @@ dynamodb.test('[index] test-mode with user-provided stream that needs splitting'
   });
 });
 dynamodb.close();
-
-kinesis2.start();
-dynamodb2.test('[index] live scan with kinesis, 2-property key', fixtures, function(assert) {
-    var records = 0;
-
-    function migrate(item, dyno, callback) {
-        var key = {id: item.id, collection: item.collection};
-        dyno.deleteItem(key, callback);
-    }
-
-    kinesis2.shards[0].on('data', function() { records++; });
-
-    var table = 'local/' + dynamodb2.tableName;
-    var stream = 'local/' + kinesis2.streamName + '/id,collection';
-
-    var options = {
-      method: 'scan',
-      database: table,
-      migrate: migrate,
-      stream: stream,
-      live: true,
-      plainJSON: false,
-      concurrency: 10,
-      rateLogging: false
-    };
-
-    migration(options, function(err, logpath) {
-        kinesis2.shards[0].on('end', function() {
-            assert.equal(records, fixtures.length, 'wrote to kinesis');
-            assert.end();
-        });
-
-        setTimeout(function() {
-            kinesis2.shards[0].close();
-        }, 1000);
-    });
-});
-dynamodb2.close();
-kinesis2.close();
