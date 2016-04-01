@@ -21,7 +21,7 @@ module.exports = function(record, dyno, callback) {
   // If you are running a dry-run, `dyno` will be null
   if (!dyno) return callback();
 
-  dyno.deleteItem({ id: record.id }, function(err) {
+  dyno.deleteItem({ Key: { id: record.id } }, function(err) {
     if (err) {
       console.error('%s failed to delete', record.id);
 
