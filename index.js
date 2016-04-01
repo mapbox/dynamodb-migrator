@@ -9,7 +9,6 @@ module.exports = function(options, callback) {
   var method = options.method;
   var database = options.database;
   var migrate = options.migrate;
-  var stream = options.stream;
   var live = options.live;
   var plainJSON = options.plainJSON;
   var concurrency = options.concurrency;
@@ -30,27 +29,13 @@ module.exports = function(options, callback) {
     params.endpoint = 'http://localhost:4567';
   }
 
-  if (stream) {
-    params.kinesisConfig = {
-      stream: stream.split('/')[1],
-      region: stream.split('/')[0],
-      key: stream.split('/')[2].split(',')
-    };
-
-    if (stream.split('/')[0] === 'local') {
-      params.kinesisConfig.accessKeyId = 'fake';
-      params.kinesisConfig.secretAccessKey = 'fake';
-      params.kinesisConfig.endpoint = 'http://localhost:7654';
-    }
-  }
-
   var dyno = Dyno(params);
 
   var parser = Parser(method === 'scan', plainJSON);
   var migrator = Migrator(migrate, dyno, concurrency, live);
 
   var scanner = (function() {
-    if (method === 'scan') return dyno.scan({ pages: 0 });
+    if (method === 'scan') return dyno.scanStream();
     if (method === 'stream') return process.stdin.pipe(split());
     if (method instanceof Readable) return method.pipe(split());
   })();

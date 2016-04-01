@@ -14,7 +14,6 @@ function usage() {
   console.error('script: relative path to a migration script');
   console.error('');
   console.error('Options:');
-  console.error(' - stream: region/name/key specifying region, name and keys (keys may be comma separated for multiple properties) for replication kinesis stream');
   console.error(' - concurrency [1]: number of records to process in parallel');
   console.error(' - live [false]: if not specified, the migration script will not receive a database reference');
   console.error(' - dyno [false]: if not specified, it is assumed that the objects are formatted using standard DynamoDB syntax. Pass the `--dyno` flag to the migrator if your input JSON objects are in a format suitable for direct usage in dyno (https://github.com/mapbox/dyno)');
@@ -52,7 +51,6 @@ var options = {
   method: method,
   database: database,
   migrate: migrate,
-  stream: args.stream,
   live: args.live,
   plainJSON: args.dyno,
   concurrency: args.concurrency || 1,

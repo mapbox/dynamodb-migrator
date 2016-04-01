@@ -22,7 +22,6 @@
   "homepage": "https://github.com/mapbox/dynamodb-migrator#readme",
   "devDependencies": {
     "dynamodb-test": "^0.2.0",
-    "kinesis-test": "^1.0.1",
     "tape": "^4.5.1",
     "underscore": "^1.8.3"
   },

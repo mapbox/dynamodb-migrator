@@ -67,12 +67,6 @@ If you're running in stream mode from something like a prior database dump, you 
     $ dynamodb-filter ./some-dump.gz ./my-script.js --output ./some-filtered-dump.gz
     ```
 
-### Write to a kinesis stream
-
-` --stream region/streamName/key`
-
-To write records to a kinesis stream for replication, `--stream` may be passed as an option. `region`, `stream name`, and `key` should be given as `/`-separated arguments in that order. `key` may contain multiple properties, separated by a comma (e.g. `region/streamName/id,collection`).
-
 ### Specify type of JSON
 
 Pass the `--dyno` flag to the migrator if your input JSON objects are in a format suitable for direct usage in [dyno](https://github.com/mapbox/dyno). Otherwise, it is assumed that the objects are formatted using standard DynamoDB syntax.
@@ -107,7 +101,6 @@ database: region/name of the database to work against
 script: relative path to a migration script
 
 Options:
- - stream: region/name/key specifying region, name and keys (keys may be comma separated for multiple properties) for replication kinesis stream
  - concurrency [1]: number of records to process in parallel
  - live [false]: if not specified, the migration script will not receive a database reference
  - dyno [false]: if not specified, it is assumed that the objects are formatted using standard DynamoDB syntax. Pass the `--dyno` flag to the migrator if your input JSON objects are in a format suitable for direct usage in dyno (https://github.com/mapbox/dyno)
