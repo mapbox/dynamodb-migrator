@@ -1,5 +1,6 @@
 var Parser = require('./lib/parser');
 var Migrator = require('./lib/migrator');
+var DynoScan = require('./lib/dyno-scan');
 var Dyno = require('dyno');
 var split = require('split');
 var Readable = require('stream').Readable;
@@ -35,7 +36,7 @@ module.exports = function(options, callback) {
   var migrator = Migrator(migrate, dyno, concurrency, live);
 
   var scanner = (function() {
-    if (method === 'scan') return dyno.scanStream();
+    if (method === 'scan') return DynoScan(dyno, concurrency);
     if (method === 'stream') return process.stdin.pipe(split());
     if (method instanceof Readable) return method.pipe(split());
   })();
