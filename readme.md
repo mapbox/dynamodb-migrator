@@ -16,14 +16,14 @@ var deleted = 0;
 module.exports = function(record, dyno, callback) {
   if (record.flag !== 'delete-me') return callback();
 
-  console.log('%s flagged for deletion', record.id);
+  console.log(`${record.id} flagged for deletion`);
 
   // If you are running a dry-run, `dyno` will be null
   if (!dyno) return callback();
 
   dyno.deleteItem({ Key: { id: record.id } }, function(err) {
     if (err) {
-      console.error('%s failed to delete', record.id);
+      console.log(`${record.id} failed to delete`);
 
       // Sending an error to the callback function will stop the migration
       return callback(new Error('A record failed to delete'));
@@ -35,7 +35,7 @@ module.exports = function(record, dyno, callback) {
 }
 
 module.exports.finish = function(dyno, callback) {
-  console.log('Deleted %s records', deleted);
+  console.log(`Deleted ${deleted} records`);
   callback();
 }
 ```
