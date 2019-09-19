@@ -37,6 +37,11 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     callback();
   };
 
+  migrate.before = function(dyno, successCallback, callback) {
+    assert.ok(dyno, 'finish function received dyno');
+    callback();
+  };
+
   var options = {
     method: 'scan',
     database: 'local/' + dynamodb.tableName,
@@ -67,6 +72,11 @@ dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(
   migrate.finish = function(dyno, callback) {
     assert.ok(dyno, 'finish function received dyno');
     callback();
+  };
+
+  migrate.before = function(dyno, successCallback, callback) {
+    assert.ok(dyno, 'finish function received dyno');
+    successCallback();
   };
 
   var testStream = new stream.Readable();
@@ -113,6 +123,11 @@ dynamodb.test('[index] test-mode with user-provided stream that needs splitting'
   migrate.finish = function(dyno, callback) {
     assert.ok(dyno, 'finish function received dyno');
     callback();
+  };
+
+  migrate.before = function(dyno, successCallback, callback) {
+    assert.ok(dyno, 'finish function received dyno');
+    successCallback();
   };
 
   var testStream = new stream.Readable();

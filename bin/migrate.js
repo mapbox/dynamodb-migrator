@@ -58,5 +58,7 @@ var options = {
 };
 
 migration(options, function(err) {
-  if (err) throw err;
+  if (err) {
+    throw err;
+  }
 });

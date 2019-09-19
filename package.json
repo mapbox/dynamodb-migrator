@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dynamodb-migrate": "bin/migrate.js",
     "test": "tape test/*.test.js"
   },
   "bin": {
