@@ -1,6 +1,6 @@
 var Parser = require('./lib/parser');
 var Migrator = require('./lib/migrator');
-var Dyno = require('dyno');
+var Dyno = require('@mapbox/dyno');
 var split = require('split');
 var Readable = require('stream').Readable;
 var util = require('util');
@@ -26,7 +26,7 @@ module.exports = function(options, callback) {
   if (region === 'local') {
     params.accessKeyId = 'fake';
     params.secretAccessKey = 'fake';
-    params.endpoint = 'http://localhost:4567';
+    params.endpoint = 'http://localhost:8000';
   }
 
   var dyno = Dyno(params);
