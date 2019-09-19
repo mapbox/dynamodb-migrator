@@ -18,6 +18,9 @@ function usage() {
   console.error(' - live [false]: if not specified, the migration script will not receive a database reference');
   console.error(' - dyno [false]: if not specified, it is assumed that the objects are formatted using standard DynamoDB syntax. Pass the `--dyno` flag to the migrator if your input JSON objects are in a format suitable for direct usage in dyno (https://github.com/mapbox/dyno)');
   console.error(' - rate [false]: log information about the rate at which migration is running. Will interfere with a migration script\'s logs');
+  console.log('To run using npm:');
+  console.log('npm run dynamodb-migrate <method> <database> <script> -- <options>');
+  console.log('eg: npm run dynamodb-migrate scan local/teams my_script.js -- --live')
 }
 
 if (args.help) {
