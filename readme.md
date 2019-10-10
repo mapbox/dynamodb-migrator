@@ -12,6 +12,7 @@ Write a module that exports a function that will run over each record in your ta
 
 ```js
 var deleted = 0;
+let item_info = {};
 
 module.exports = function(record, dyno, callback) {
   if (record.flag !== 'delete-me') return callback();
@@ -19,7 +20,10 @@ module.exports = function(record, dyno, callback) {
   console.log(`${record.id} flagged for deletion`);
 
   // If you are running a dry-run, `dyno` will be null
+  // can use item_info populated in before method
+  console.log(item_info)
   if (!dyno) return callback();
+  
 
   dyno.deleteItem({ Key: { id: record.id } }, function(err) {
     if (err) {
@@ -32,6 +36,18 @@ module.exports = function(record, dyno, callback) {
     deleted++;
     callback();
   });
+}
+
+module.exports.before = function(dyno, successCallback, callback) {
+	dyno.scan({TableName: 'item_info'}, function (err, data) {
+		if(err) {
+			callback(err);
+		}
+		else {
+			item_info = data;
+			successCallback();
+		}
+	});
 }
 
 module.exports.finish = function(dyno, callback) {
@@ -105,4 +121,8 @@ Options:
  - live [false]: if not specified, the migration script will not receive a database reference
  - dyno [false]: if not specified, it is assumed that the objects are formatted using standard DynamoDB syntax. Pass the `--dyno` flag to the migrator if your input JSON objects are in a format suitable for direct usage in dyno (https://github.com/mapbox/dyno)
  - rate [false]: log information about the rate at which migration is running. Will interfere with a migration script's logs
+
+To run using npm:
+npm run dynamodb-migrate <method> <database> <script> -- <options>
+eg: npm run dynamodb-migrate scan local/teams my_script.js -- --live
 ```

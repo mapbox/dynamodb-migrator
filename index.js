@@ -1,6 +1,6 @@
 var Parser = require('./lib/parser');
 var Migrator = require('./lib/migrator');
-var Dyno = require('dyno');
+var Dyno = require('@mapbox/dyno');
 var split = require('split');
 var Readable = require('stream').Readable;
 var util = require('util');
@@ -26,15 +26,13 @@ module.exports = function(options, callback) {
   if (region === 'local') {
     params.accessKeyId = 'fake';
     params.secretAccessKey = 'fake';
-    params.endpoint = 'http://localhost:4567';
+    params.endpoint = 'http://localhost:8000';
   }
 
   var dyno = Dyno(params);
-
   var parser = Parser(method === 'scan', plainJSON);
   var migrator = Migrator(migrate, dyno, concurrency, live);
-
-  var scanner = (function() {
+  var scanner = (function () {
     if (method === 'scan') return dyno.scanStream();
     if (method === 'stream') return process.stdin.pipe(split());
     if (method instanceof Readable) return method.pipe(split());
@@ -42,13 +40,13 @@ module.exports = function(options, callback) {
 
   if (rateLogging) {
     scanner.scans = 0;
-    scanner.on('dbrequest', function() {
+    scanner.on('dbrequest', function () {
       scanner.scans++;
     });
 
     var starttime = Date.now();
 
-    setInterval(function() {
+    setInterval(function () {
       var msg = util.format(
         '\r\033[KScanner scans: %s, read depth: %s, Parser write depth: %s, read depth: %s | Migrator depth: %s, active: %s, %s/s',
         scanner.scans,
@@ -63,13 +61,16 @@ module.exports = function(options, callback) {
     }, 50).unref();
   }
 
-  scanner
-    .pipe(parser)
+  let successCallback = function() {
+    scanner
+      .pipe(parser)
       .on('error', callback)
-    .pipe(migrator)
+      .pipe(migrator)
       .on('error', callback)
-      .on('finish', function() {
+      .on('finish', function () {
         if (migrate.finish) migrate.finish(live ? dyno : null, callback);
         else callback();
       });
+  }
+  migrate.before(dyno, successCallback, callback);
 };
