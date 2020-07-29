@@ -9,8 +9,8 @@ var cmd = path.resolve(__dirname, '..', 'bin', 'filter.js');
 var exec = require('child_process').exec;
 
 var infile = path.resolve(__dirname, 'fixtures', 'input.gz');
-var expected = path.resolve(__dirname, 'fixtures', 'output.gz');
-expected = fs.readFileSync(expected);
+var expectedFile = path.resolve(__dirname, 'fixtures', 'output.gz');
+var expected = fs.readFileSync(expectedFile);
 var filter = path.resolve(__dirname, 'fixtures', 'filter.js');
 
 test('[filter] filters', function(assert) {

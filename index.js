@@ -1,6 +1,6 @@
 var Parser = require('./lib/parser');
 var Migrator = require('./lib/migrator');
-var Dyno = require('dyno');
+var Dyno = require('@mapbox/dyno');
 var split = require('split');
 var Readable = require('stream').Readable;
 var util = require('util');
