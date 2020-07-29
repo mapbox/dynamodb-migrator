@@ -21,14 +21,14 @@
   },
   "homepage": "https://github.com/mapbox/dynamodb-migrator#readme",
   "devDependencies": {
-    "dynamodb-test": "^0.2.0",
-    "tape": "^4.5.1",
+    "dynamodb-test": "^0.3.0",
+    "tape": "^5.0.1",
     "underscore": "^1.8.3"
   },
   "dependencies": {
-    "dyno": "^1.0.1",
+    "@mapbox/dyno": "^1.0.1",
     "minimist": "^1.2.0",
-    "queue-async": "1.0.7",
-    "split": "^0.3.3"
+    "d3-queue": "^3.0.7",
+    "split": "^1.0.1"
   }
 }

@@ -1,7 +1,7 @@
 var test = require('tape');
 var _ = require('underscore');
 var Parser = require('../lib/parser');
-var Dyno = require('dyno');
+var Dyno = require('@mapbox/dyno');
 
 test('[parser] strings, DynamoDB wire-format json', function(assert) {
   var parser = Parser(false, false);
