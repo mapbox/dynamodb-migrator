@@ -9,7 +9,7 @@ var cmd = path.resolve(__dirname, '..', 'bin', 'filter.js');
 var exec = require('child_process').exec;
 
 var infile = path.resolve(__dirname, 'fixtures', 'input.gz');
-var expectedFile = path.resolve(__dirname, 'fixtures', 'output.gz');
+var expectedFile = path.resolve(__dirname, 'fixtures', 'output');
 var expected = fs.readFileSync(expectedFile);
 var filter = path.resolve(__dirname, 'fixtures', 'filter.js');
 
@@ -20,7 +20,7 @@ test('[filter] filters', function(assert) {
       found = Buffer.concat([found, chunk]);
     })
     .on('end', function() {
-      assert.deepEqual(found, expected, 'created expected output file');
+      assert.deepEqual(zlib.gunzipSync(found).toString(), expected.toString(), 'created expected output file');
       assert.end();
     });
 });
@@ -33,7 +33,7 @@ test('[filter] cli filters', function(assert) {
 
   proc.on('close', function() {
     fs.readFile(outputFile, function(err, found) {
-      assert.deepEqual(found, expected, 'created expected output file');
+      assert.deepEqual(zlib.gunzipSync(found).toString(), expected.toString(), 'created expected output file');
       assert.end();
     });
   });
