@@ -54,7 +54,8 @@ var options = {
   live: args.live,
   plainJSON: args.dyno,
   concurrency: args.concurrency || 1,
-  rateLogging: args.rate
+  rateLogging: args.rate,
+  endpoint: args.endpoint || 'http://localhost:4567'
 };
 
 migration(options, function(err) {
