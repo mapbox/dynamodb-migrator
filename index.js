@@ -13,6 +13,7 @@ module.exports = function(options, callback) {
   var plainJSON = options.plainJSON;
   var concurrency = options.concurrency;
   var rateLogging = options.rateLogging;
+  var endpoint = options.endpoint;
 
   require('http').globalAgent.maxSockets = 5 * concurrency;
   require('https').globalAgent.maxSockets = 5 * concurrency;
@@ -26,7 +27,7 @@ module.exports = function(options, callback) {
   if (region === 'local') {
     params.accessKeyId = 'fake';
     params.secretAccessKey = 'fake';
-    params.endpoint = 'http://localhost:4567';
+    params.endpoint = endpoint;
   }
 
   var dyno = Dyno(params);

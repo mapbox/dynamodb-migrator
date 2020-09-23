@@ -45,7 +45,8 @@ dynamodb.test('[index] live scan', fixtures, function(assert) {
     live: true,
     plainJSON: false,
     concurrency: 10,
-    rateLogging: false
+    rateLogging: false,
+    endpoint: 'http://localhost:4567'
   };
 
   migration(options, function(err, logpath) {
@@ -86,7 +87,8 @@ dynamodb.test('[index] test-mode with user-provided stream', fixtures, function(
     live: true,
     plainJSON: false,
     concurrency: 10,
-    rateLogging: false
+    rateLogging: false,
+    endpoint: 'http://localhost:4567'
   };
 
   migration(options, function(err, logpath) {
@@ -136,7 +138,8 @@ dynamodb.test('[index] test-mode with user-provided stream that needs splitting'
     live: true,
     plainJSON: false,
     concurrency: 10,
-    rateLogging: false
+    rateLogging: false,
+    endpoint: 'http://localhost:4567'
   };
 
   migration(options, function(err, logpath) {
